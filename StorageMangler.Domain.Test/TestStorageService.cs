@@ -7,35 +7,34 @@ using NUnit.Framework;
 using StorageMangler.Domain.Infrastructure;
 using StorageMangler.Domain.Model;
 using StorageMangler.Domain.Service;
+using Moq;
+
 
 namespace StorageMangler.Domain.Test
 {
     [TestFixture]
     public class TestStorageService
     {
-        private  IFileMetaDataRepository _metaDataRepository;
-        private  IFileStorage _fileStorage;
-        private  ForbiddenNamesService _forbiddenService;
-        private  ILoggerFactory _logger;
+        private Mock<IFileMetaDataRepository> _metaDataRepository;
+        private Mock<IFileStorage> _fileStorage;
+        private Mock<ForbiddenNamesService> _forbiddenService;
+        private Mock<ILoggerFactory> _logger;
 
         [SetUp]
         public void SetUp()
         {
-            var services = new ServiceCollection();
-            var serviceProvider = services.BuildServiceProvider();
+            _metaDataRepository = new Mock<IFileMetaDataRepository>();
+            _fileStorage = new Mock<IFileStorage>();
+            _forbiddenService = new Mock<ForbiddenNamesService>();
+            _logger = new Mock<ILoggerFactory>();
 
-
-            _metaDataRepository = serviceProvider.GetService<IFileMetaDataRepository>();
-            _fileStorage = serviceProvider.GetService<IFileStorage>();
-            _forbiddenService = serviceProvider.GetService<ForbiddenNamesService>();
-            _logger = serviceProvider.GetService<ILoggerFactory>();
         }
 
 
         [Test]
         public async Task TestListNonForbiddenFiles()
         {
-            StorageService ss = new StorageService(_metaDataRepository, _fileStorage, _forbiddenService, _logger);
+            StorageService ss = new StorageService(_metaDataRepository.Object, _fileStorage.Object, _forbiddenService.Object, _logger.Object);
             List<FileInfo> lf = await ss.ListNonForbiddenFiles();
             Assert.IsNotNull(lf);
             Assert.Greater(0, lf.Count);
