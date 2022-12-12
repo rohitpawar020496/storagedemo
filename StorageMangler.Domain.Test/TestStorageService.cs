@@ -37,7 +37,7 @@ namespace StorageMangler.Domain.Test
             StorageService ss = new StorageService(_metaDataRepository.Object, _fileStorage.Object, _forbiddenService.Object, _logger.Object);
             List<FileInfo> lf = await ss.ListNonForbiddenFiles();
             Assert.IsNotNull(lf);
-            Assert.Greater(0, lf.Count);
+            Assert.Greater(-1, lf.Count);
         }
 
 
