@@ -12,35 +12,43 @@ using Moq;
 
 namespace StorageMangler.Domain.Test
 {
+
     [TestFixture]
     public class TestStorageService
     {
-        private Mock<IFileMetaDataRepository> _metaDataRepository;
-        private Mock<IFileStorage> _fileStorage;
-        private Mock<ForbiddenNamesService> _forbiddenService;
-        private Mock<ILoggerFactory> _logger;
+        private readonly IFileMetaDataRepository _metaDataRepository;
+        private readonly IFileStorage _fileStorage;
+        private readonly ForbiddenNamesService _forbiddenService;
+        private readonly ILoggerFactory _logger;
 
         [SetUp]
         public void SetUp()
         {
-            _metaDataRepository = new Mock<IFileMetaDataRepository>();
-            _fileStorage = new Mock<IFileStorage>();
-            _forbiddenService = new Mock<ForbiddenNamesService>();
-            _logger = new Mock<ILoggerFactory>();
+            _var services = new ServiceCollection();
+            var serviceProvider = services.BuildServiceProvider();
+
+
+            _metaDataRepository = serviceProvider.GetService<IFileMetaDataRepository>();
+            _fileStorage = serviceProvider.GetService<IFileStorage>();
+            _forbiddenService = serviceProvider.GetService<ForbiddenNamesService>();
+            _logger = serviceProvider.GetService<ILoggerFactory>();
 
         }
 
 
-        [Test]
+       [Test]
         public async Task TestListNonForbiddenFiles()
         {
-            StorageService ss = new StorageService(_metaDataRepository.Object, _fileStorage.Object, _forbiddenService.Object, _logger.Object);
+            StorageService ss = new StorageService(_metaDataRepository, _fileStorage, _forbiddenService, _logger);
             List<FileInfo> lf = await ss.ListNonForbiddenFiles();
             Assert.IsNotNull(lf);
-            Assert.Greater(-1, lf.Count);
+            Assert.Greater(0, lf.Count);
         }
 
 
     }
+
+    
+   
 }
 
